@@ -1,0 +1,13 @@
+[package]
+name = "wasm-bindgen-rayon"
+version = "0.1.0"
+authors = ["Ingvar Stepanyan <rreverser@google.com>"]
+edition = "2018"
+
+[dependencies]
+crossbeam-channel = "0.5"
+wasm-bindgen = "0.2"
+rayon = "1.5"
+
+[workspace]
+members = ["test"]

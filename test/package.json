@@ -1,0 +1,17 @@
+{
+	"private": true,
+	"dependencies": {
+		"@surma/rollup-plugin-off-main-thread": "^2.0.0",
+		"@web/rollup-plugin-import-meta-assets": "^1.0.4",
+		"puppeteer": "^7.0.0",
+		"requirejs": "^2.3.6",
+		"rollup": "^2.38.4",
+		"rollup-plugin-node-resolve": "^5.2.0",
+		"wasm-pack": "^0.9.1",
+		"webpack": "^5.20.1",
+		"webpack-cli": "^4.5.0"
+	},
+	"scripts": {
+		"test": "./test.sh"
+	}
+}
