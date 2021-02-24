@@ -19,8 +19,10 @@ waitForMsgType(self, 'wasm_bindgen_worker_init').then(async data => {
   // This could be a regular import, but then some bundlers complain about
   // circular deps.
   //
-  // Dynamic import should be cheap, since this JS is bundled into the
-  // parent and the import below gets transformed into ~ `Promise.resolve(x)`.
+  // Dynamic import could be cheap if this file was inlined into the parent,
+  // which would require us just using `../../..` in `new Worker` below,
+  // but that doesn't work because wasm-pack unconditionally adds
+  // "sideEffects":false (see below).
   const pkg = await import('../../..');
   await pkg.default(data.module, data.memory);
   postMessage({ type: 'wasm_bindgen_worker_ready' });
@@ -38,16 +40,22 @@ export async function startWorkers(module, memory, builder) {
   try {
     await Promise.all(
       Array.from({ length: builder.numThreads() }, () => {
-        // Importing the parent to avoid code splitting of workerHelpers.js
-        // into a separate bundle by Rollup / Webpack.
-        //
-        // This is a very small file and should be just inlined into
-        // all the other wasm-bindgen generated JS.
+        // Self-spawn into a new Worker.
         //
         // TODO: while `new URL('...', import.meta.url) becomes a semi-standard
         // way to get asset URLs relative to the module across various bundlers
         // and browser, ideally we should switch to `import.meta.resolve`
         // once it becomes a standard.
+        //
+        // Note: we could use `../../..` as the URL here to inline workerHelpers.js
+        // into the parent entry instead of creating another split point -
+        // this would be preferable from optimization perspective -
+        // however, Webpack then eliminates all message handler code
+        // because wasm-pack produces "sideEffects":false in package.json
+        // unconditionally.
+        //
+        // The only way to work around that is to have side effect code
+        // in an entry point such as Worker file itself.
         const worker = new Worker(new URL('./workerHelpers.js', import.meta.url), {
           type: 'module'
         });
