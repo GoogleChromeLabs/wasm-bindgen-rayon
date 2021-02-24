@@ -1,3 +1,4 @@
 /target
 Cargo.lock
 /test/node_modules
+/test/.parcel-cache

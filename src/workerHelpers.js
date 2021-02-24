@@ -48,7 +48,9 @@ export async function startWorkers(module, memory, builder) {
         // way to get asset URLs relative to the module across various bundlers
         // and browser, ideally we should switch to `import.meta.resolve`
         // once it becomes a standard.
-        const worker = new Worker(new URL('./workerHelpers.js', import.meta.url));
+        const worker = new Worker(new URL('./workerHelpers.js', import.meta.url), {
+          type: 'module'
+        });
         worker.postMessage(workerInit);
         return waitForMsgType(worker, 'wasm_bindgen_worker_ready');
       })

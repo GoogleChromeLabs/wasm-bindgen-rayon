@@ -1,22 +1,15 @@
-const relativePath = '/pkg/test.webpack.js/';
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'production',
   optimization: {
-    minimize: false,
-    splitChunks: {
-      chunks: 'all',
-      enforceSizeThreshold: 0
-    }
+    minimize: false
   },
   entry: {
-    index: {
-      import: './index.js',
-      library: { type: 'amd' }
-    }
+    index: './index.js'
   },
   output: {
-    path: __dirname + relativePath,
-    publicPath: relativePath,
-  }
+    path: __dirname + '/pkg/test.webpack.js/',
+  },
+  plugins: [new HtmlWebpackPlugin()]
 };
