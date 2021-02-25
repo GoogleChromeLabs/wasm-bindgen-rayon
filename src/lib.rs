@@ -10,8 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-use crossbeam_channel::{bounded, Receiver, Sender};
+use spmc::{channel, Receiver, Sender};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
 
@@ -31,17 +30,13 @@ extern "C" {
     fn start_workers(module: JsValue, memory: JsValue, builder: wbg_rayon_PoolBuilder) -> JsValue;
 }
 
-fn assert_sync<T: Sync>(value: &T) -> &T {
-    value
-}
-
 #[wasm_bindgen]
 impl wbg_rayon_PoolBuilder {
     fn new(num_threads: usize) -> Self {
         // 0 means that sender will block until receiver takes a message.
         // We can use it because all the threads are spawned and ready to accept
         // messages by the time we call `build()` to instantiate spawn handler.
-        let (sender, receiver) = bounded(0);
+        let (sender, receiver) = channel();
         Self {
             num_threads,
             sender,
@@ -58,13 +53,13 @@ impl wbg_rayon_PoolBuilder {
         // Make sure it's safe to share Receiver with other Workers.
         // This is a no-op compilation level check just to prevent issues
         // when switching from crossbeam to a different channels implementation.
-        assert_sync(&self.receiver)
+        &self.receiver
     }
 
     // This should be called by the JS side once all the Workers are spawned.
     // Important: it must take `self` by reference, otherwise
     // `start_worker_thread` will try to receive a message on a moved value.
-    pub fn build(&self) {
+    pub fn build(&mut self) {
         rayon::ThreadPoolBuilder::new()
             .num_threads(self.num_threads)
             // We could use postMessage here instead of crossbeam channels,
@@ -91,7 +86,11 @@ pub fn init_thread_pool(num_threads: usize) -> JsValue {
 
 #[wasm_bindgen]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub fn wbg_rayon_start_worker(receiver: *const Receiver<rayon::ThreadBuilder>) {
+pub fn wbg_rayon_start_worker(receiver: *const Receiver<rayon::ThreadBuilder>)
+where
+    // Statically assert that it's safe to accept `Receiver` from another thread.
+    Receiver<rayon::ThreadBuilder>: Sync,
+{
     // This is safe, because we know it came from a reference to PoolBuilder,
     // allocated on the heap by wasm-bindgen and dropped only once all the
     // threads are running.

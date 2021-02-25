@@ -9,9 +9,9 @@ keywords = ["web", "thread", "parallel", "concurrency", "performance", "webassem
 categories = ["concurrency", "webassembly", "web-programming"]
 
 [dependencies]
-crossbeam-channel = "0.5"
 wasm-bindgen = "0.2"
 rayon = "1.5"
+spmc = "0.3.0"
 
 [workspace]
 members = ["test"]
