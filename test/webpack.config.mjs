@@ -11,9 +11,13 @@
  * limitations under the License.
  */
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports = {
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+export default {
   mode: 'production',
   optimization: {
     minimize: false
