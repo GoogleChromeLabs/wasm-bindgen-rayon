@@ -34,6 +34,8 @@ function randInRange(min, max) {
       ]
     });
   });
+  // We don't want to block the script on the server.
+  server.unref();
   const port = randInRange(49152, 65535);
   process.stdout.write(`Starting server on port ${port}... `);
   await new Promise(resolve => server.listen(port, resolve));
@@ -58,7 +60,7 @@ function randInRange(min, max) {
   }
 
   console.log('Running tests...');
-  await Promise.allSettled(
+  await Promise.all(
     ['rollup', 'webpack'/*, 'parcel'*/].map(name =>
       runTest(name).catch(err => console.error(name, err))
     )
@@ -66,7 +68,6 @@ function randInRange(min, max) {
 
   console.log('Shutting down...');
   await browser.close();
-  server.unref();
 })().catch(err => {
   setTimeout(() => {
     throw err;

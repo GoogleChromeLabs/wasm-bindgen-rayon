@@ -15,5 +15,5 @@ RUSTFLAGS='-C target-feature=+atomics,+bulk-memory' rustup run nightly wasm-pack
 
 webpack
 rollup -c
-# parcel build index.html --target app --public-url . --no-optimize --no-content-hash
+# parcel build index.html --target app --public-url . --no-optimize --no-autoinstall
 node run-tests
