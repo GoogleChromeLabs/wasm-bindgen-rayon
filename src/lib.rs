@@ -10,6 +10,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+use js_sys::Promise;
 use spmc::{channel, Receiver, Sender};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
@@ -27,7 +29,7 @@ pub struct wbg_rayon_PoolBuilder {
 #[wasm_bindgen(module = "/src/workerHelpers.js")]
 extern "C" {
     #[wasm_bindgen(js_name = startWorkers)]
-    fn start_workers(module: JsValue, memory: JsValue, builder: wbg_rayon_PoolBuilder) -> JsValue;
+    fn start_workers(module: JsValue, memory: JsValue, builder: wbg_rayon_PoolBuilder) -> Promise;
 }
 
 #[wasm_bindgen]
@@ -76,7 +78,7 @@ impl wbg_rayon_PoolBuilder {
 }
 
 #[wasm_bindgen(js_name = initThreadPool)]
-pub fn init_thread_pool(num_threads: usize) -> JsValue {
+pub fn init_thread_pool(num_threads: usize) -> Promise {
     start_workers(
         wasm_bindgen::module(),
         wasm_bindgen::memory(),

@@ -102,6 +102,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "js-sys"
+version = "0.3.48"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc9f84f9b115ce7843d60706df1422a916680bfdfcbdb0447c5614ff9d7e4d78"
+dependencies = [
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -288,6 +297,7 @@ dependencies = [
 name = "wasm-bindgen-rayon"
 version = "0.1.0"
 dependencies = [
+ "js-sys",
  "rayon",
  "spmc",
  "wasm-bindgen",
