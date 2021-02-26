@@ -27,19 +27,19 @@ import getPort from 'get-port';
   async function startServer() {
     return new Promise(resolve => {
       createServer((request, response) =>
-          serveHandler(request, response, {
-            cleanUrls: false,
-            headers: [
-              {
-                source: '**/*.{js,html}',
-                headers: [
-                  { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
-                  { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' }
-                ]
-              }
-            ]
-          })
-        )
+        serveHandler(request, response, {
+          cleanUrls: false,
+          headers: [
+            {
+              source: '**/*.{js,html}',
+              headers: [
+                { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
+                { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' }
+              ]
+            }
+          ]
+        })
+      )
         .unref() // We don't want to block the script on the server.
         .listen(port, resolve);
     });
