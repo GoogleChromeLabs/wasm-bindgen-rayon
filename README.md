@@ -98,7 +98,7 @@ For Rollup, you'll need [`@surma/rollup-plugin-off-main-thread`](https://github.
 
 ### Usage with Parcel
 
-*[Coming soon...]* Parcel v2 also recognises the used syntax, but it's still in development and there are some issues to fix it can be used with this crate.
+*[Coming soon...]* Parcel v2 also recognises the used syntax, but it's still in development and there are some minor issues to fix before it can be used with this crate.
 
 ### Usage without bundlers
 
