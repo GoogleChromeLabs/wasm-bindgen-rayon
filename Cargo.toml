@@ -7,6 +7,7 @@ license = "Apache-2.0"
 description = "Adapter for using Rayon-based concurrency on the Web"
 keywords = ["web", "thread", "parallel", "concurrency", "performance", "webassembly"]
 categories = ["concurrency", "webassembly", "web-programming"]
+readme = "README.md"
 
 [dependencies]
 wasm-bindgen = "0.2"
@@ -16,3 +17,9 @@ js-sys = "0.3.48"
 
 [workspace]
 members = ["test"]
+
+[features]
+nightly = []
+
+[package.metadata.docs.rs]
+features = ["nightly"]

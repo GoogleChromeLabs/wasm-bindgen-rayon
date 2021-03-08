@@ -1,3 +1,6 @@
+#![cfg_attr(feature = "nightly", feature(external_doc), doc(include = "../README.md"))]
+#![cfg_attr(not(feature = "nightly"), doc = "Check out documentation in [README.md](https://github.com/GoogleChromeLabs/wasm-bindgen-rayon).")]
+
 /**
  * Copyright 2021 Google Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +23,7 @@ use wasm_bindgen::JsValue;
 // and https://github.com/rustwasm/wasm-bindgen/issues/1762.
 #[allow(non_camel_case_types)]
 #[wasm_bindgen]
+#[doc(hidden)]
 pub struct wbg_rayon_PoolBuilder {
     num_threads: usize,
     sender: Sender<rayon::ThreadBuilder>,
@@ -78,6 +82,7 @@ impl wbg_rayon_PoolBuilder {
 }
 
 #[wasm_bindgen(js_name = initThreadPool)]
+#[doc(hidden)]
 pub fn init_thread_pool(num_threads: usize) -> Promise {
     start_workers(
         wasm_bindgen::module(),
@@ -88,6 +93,7 @@ pub fn init_thread_pool(num_threads: usize) -> Promise {
 
 #[wasm_bindgen]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
+#[doc(hidden)]
 pub fn wbg_rayon_start_worker(receiver: *const Receiver<rayon::ThreadBuilder>)
 where
     // Statically assert that it's safe to accept `Receiver` from another thread.
