@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-extern crate wasm_bindgen_rayon;
+pub use wasm_bindgen_rayon::init_thread_pool;
 
 use rayon::prelude::*;
 use wasm_bindgen::prelude::*;
