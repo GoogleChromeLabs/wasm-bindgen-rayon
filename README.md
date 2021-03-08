@@ -24,6 +24,19 @@ await initThreadPool(navigator.hardwareConcurrency /* or any number of threads y
 // ...now you can invoke any exported functions as you normally would
 ```
 
+## Using Rayon
+
+Use [Rayon](https://github.com/rayon-rs/rayon) iterators as you normally would, e.g.
+
+```rust
+#[wasm_bindgen]
+pub fn sum(numbers: &[i32]) -> i32 {
+    numbers.par_iter().sum()
+}
+```
+
+will accept an `Int32Array` from JavaScript side and calculate the sum of its values using all available threads.
+
 ## Building Rust code
 
 First limitation to note is that you'll have to use `wasm-bindgen`/`wasm-pack`'s `web` target (`--target web`).
