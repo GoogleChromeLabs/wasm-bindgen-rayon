@@ -90,11 +90,11 @@ wasm-bindgen-rayon provides the required JS code for those Workers internally, a
 
 ### Usage with Webpack
 
-If you're using Webpack v5, you don't need to do anything special, as it already support [bundling Workers](https://webpack.js.org/guides/web-workers/) out of the box.
+If you're using Webpack v5 (version >= 5.25.1), you don't need to do anything special, as it already support [bundling Workers](https://webpack.js.org/guides/web-workers/) out of the box.
 
 ### Usage with Rollup
 
-For Rollup, you'll need [`@surma/rollup-plugin-off-main-thread`](https://github.com/surma/rollup-plugin-off-main-thread) plugin which brings the same functionality and was tested with this crate.
+For Rollup, you'll need [`@surma/rollup-plugin-off-main-thread`](https://github.com/surma/rollup-plugin-off-main-thread) plugin (version >= 2.1.0) which brings the same functionality and was tested with this crate.
 
 ### Usage with Parcel
 
@@ -104,7 +104,7 @@ For Rollup, you'll need [`@surma/rollup-plugin-off-main-thread`](https://github.
 
 This crate's JS glue was designed in a way that works great with bundlers and code-splitting, but, sadly, not yet in browsers due to different treatment of import paths. We're keeping an eye on the [`WICG/import-maps`](https://github.com/WICG/import-maps) spec which might allow full compatibility.
 
-It's possible to provide a separate JS glue just for bundlerless apps, but this use-case is currently not prioritised. If it's something you need, please let us know via issues!
+It's possible to provide a separate JS glue just for bundlerless apps, but this use-case is currently not prioritised. If it's something you need, please let us know via issues or, better yet, make a PR!
 
 # License
 
