@@ -16,5 +16,6 @@ jobs:
     - name: Run tests
       working-directory: ./test
       run: |
+        rustup component add rust-src
         npm ci
         npm test
