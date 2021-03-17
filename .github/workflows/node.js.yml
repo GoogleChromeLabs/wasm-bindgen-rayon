@@ -15,6 +15,4 @@ jobs:
     - uses: actions/checkout@v2
     - name: Run tests
       run: |
-        cd test
-        npm i
-        npm test
+        cd $GITHUB_WORKSPACE/test &&  npm i && npm test
