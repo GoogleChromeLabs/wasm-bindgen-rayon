@@ -19,5 +19,5 @@ jobs:
     - name: Run tests
       working-directory: ./test
       run: |
-        npm ci
+        npm i
         npm test
