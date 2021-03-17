@@ -16,5 +16,5 @@ jobs:
     - name: Run tests
       run: |
         cd test
-        npm ci
+        npm i
         npm test
