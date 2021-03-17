@@ -136,6 +136,16 @@ The default JS glue was designed in a way that works great with bundlers and cod
 
 If you want to build this library for usage without bundlers, enable `no-bundler` feature for `wasm-bindgen-rayon` in your `Cargo.toml`.
 
+# Final caveats
+
+Check out caveats listed in the [wasm-bindgen threading docs](https://rustwasm.github.io/wasm-bindgen/examples/raytrace.html).
+
+While this library specifically targets Rayon and automatically provides the necessary shims for you, some of the caveats still apply.
+
+Most notable, even when you're using threads, the main thread is still going to be blocked while waiting for all the calculations to finish.
+
+While this is usually not worse (if anything, quicker) than running same calculations without multithreading support, you should still seriously consider moving the main JS+Wasm to a dedicated Worker as well to avoid blocking UI altogether.
+
 # License
 
 This crate is licensed under the Apache-2.0 license.
