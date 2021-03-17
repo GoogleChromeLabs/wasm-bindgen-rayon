@@ -138,6 +138,8 @@ The default JS glue was designed in a way that works great with bundlers and cod
 
 If you want to build this library for usage without bundlers, enable `no-bundler` feature for `wasm-bindgen-rayon` in your `Cargo.toml`.
 
+Note that, in addition to the earlier mentioned restrictions, this will work only in browsers with [support for Module Workers](https://caniuse.com/mdn-api_worker_worker_ecmascript_modules) (when using bundlers, those are bundled to regular Workers automatically).
+
 # Final caveats
 
 Check out caveats listed in the [wasm-bindgen threading docs](https://rustwasm.github.io/wasm-bindgen/examples/raytrace.html).
