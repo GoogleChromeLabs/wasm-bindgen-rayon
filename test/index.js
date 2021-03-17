@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import init, { initThreadPool, sum } from './pkg';
+import init, { initThreadPool, sum } from './pkg/test.js';
 
 async function runTest() {
   await init();

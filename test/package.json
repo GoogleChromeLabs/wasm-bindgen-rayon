@@ -22,10 +22,15 @@
 	},
 	"targets": {
 		"app": {
-			"distDir": "pkg/test.parcel.js"
+			"distDir": "pkg/parcel"
 		}
 	},
 	"scripts": {
-		"test": "./test.sh"
+		"build:wasm": "wasm-pack build --target web --out-name test",
+		"build:bundler": "npm run build:wasm && webpack && rollup -c",
+		"build:no-bundler": "npm run build:wasm -- -- --features wasm-bindgen-rayon/no-bundler",
+		"build": "npm run build:bundler && npm run build:no-bundler",
+		"pretest": "npm run build",
+		"test": "node run-tests.mjs"
 	}
 }

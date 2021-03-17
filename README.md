@@ -51,10 +51,40 @@ The other issue is that the Rust standard library for the WebAssembly target is 
 
 Since we do want standard APIs like [`Mutex`, `Arc` and so on to work](https://doc.rust-lang.org/std/sync/), you'll need to use the nightly compiler toolchain and pass some flags to rebuild the standard library in addition to your own code.
 
-If you're using [`wasm-pack`](https://rustwasm.github.io/wasm-pack/book/), the whole command for building your code with threads support will look like this:
+### Using config files
 
-```bash
-RUSTFLAGS='-C target-feature=+atomics,+bulk-memory' rustup run nightly wasm-pack build [...normal wasm-pack params...] -- -Z build-std=panic_abort,std
+The easiest way to configure those flags is:
+
+1. Put a string `nightly` in a `rust-toolchain` file in your project directory. This tells Rustup to use nightly toolchain by default for your project.
+2. Put the following in a `.cargo/config` file in your project directory:
+
+   ```toml
+   [target.wasm32-unknown-unknown]
+   rustflags = ["-C", "target-feature=+atomics,+bulk-memory"]
+
+   [unstable]
+   build-std = ["panic_abort", "std"]
+   ```
+
+   This tells Cargo to rebuild the standard library with support for Wasm atomics.
+
+Then, run [`wasm-pack`](https://rustwasm.github.io/wasm-pack/book/) as you normally would with `--target web`:
+
+```sh
+$ wasm-pack build --target web [...normal wasm-pack params...]
+```
+
+### Using command-line params
+
+If you prefer not to configure those parameters by default, you can pass them as part of the build command itself.
+
+In that case, the whole command looks like this:
+
+```sh
+RUSTFLAGS='-C target-feature=+atomics,+bulk-memory' \
+	rustup run nightly \
+	wasm-pack build --target web [...] \
+	-- -Z build-std=panic_abort,std
 ```
 
 It looks a bit scary, but it takes care of everything - choosing the nightly toolchain, enabling the required features as well as telling Cargo to rebuild the standard library. You only need to copy it once and hopefully forget about it :)
@@ -63,13 +93,13 @@ It looks a bit scary, but it takes care of everything - choosing the nightly too
 
 [Not all browsers](https://webassembly.org/roadmap/) support WebAssembly threads yet, so you'll likely want to make two builds - one with threads support and one without - and use feature detection to choose the right one on the JavaScript side.
 
-You can use [`wasm-feature-detect`](https://github.com/GoogleChromeLabs/wasm-feature-detect) for this purpose. The code will look like this:
+You can use [`wasm-feature-detect`](https://github.com/GoogleChromeLabs/wasm-feature-detect) library for this purpose. The code will look roughly like this:
 
 ```js
 import { threads } from 'wasm-feature-detect';
 
-// ...
 let wasmPkg;
+
 if (await threads()) {
 	wasmPkg = await import('./pkg-with-threads/index.js');
 	await wasmPkg.default();
@@ -102,9 +132,9 @@ For Rollup, you'll need [`@surma/rollup-plugin-off-main-thread`](https://github.
 
 ### Usage without bundlers
 
-This crate's JS glue was designed in a way that works great with bundlers and code-splitting, but, sadly, not yet in browsers due to different treatment of import paths. We're keeping an eye on the [`WICG/import-maps`](https://github.com/WICG/import-maps) spec which might allow full compatibility.
+The default JS glue was designed in a way that works great with bundlers and code-splitting, but, sadly, not yet in browsers due to different treatment of import paths (see [`WICG/import-maps#244`](https://github.com/WICG/import-maps/issues/244) which might help unify those in the future).
 
-It's possible to provide a separate JS glue just for bundlerless apps, but this use-case is currently not prioritised. If it's something you need, please let us know via issues or, better yet, make a PR!
+If you want to build this library for usage without bundlers, enable `no-bundler` feature for `wasm-bindgen-rayon` in your `Cargo.toml`.
 
 # License
 

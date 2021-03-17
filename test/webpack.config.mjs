@@ -26,7 +26,7 @@ export default {
     index: './index.js'
   },
   output: {
-    path: __dirname + '/pkg/test.webpack.js/',
+    path: __dirname + '/pkg/webpack/',
   },
   plugins: [new HtmlWebpackPlugin()]
 };

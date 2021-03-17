@@ -15,6 +15,7 @@ import serveHandler from 'serve-handler';
 import { createServer } from 'http';
 import puppeteer from 'puppeteer';
 import getPort from 'get-port';
+import { promises as fs } from 'fs';
 
 (async () => {
   async function logStep(description, promise) {
@@ -25,28 +26,22 @@ import getPort from 'get-port';
   }
 
   async function startServer() {
+    const config = JSON.parse(await fs.readFile('serve.json', 'utf-8'));
+
     return new Promise(resolve => {
       createServer((request, response) =>
-        serveHandler(request, response, {
-          cleanUrls: false,
-          headers: [
-            {
-              source: '**/*.{js,html}',
-              headers: [
-                { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
-                { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' }
-              ]
-            }
-          ]
-        })
+        serveHandler(request, response, config)
       )
         .unref() // We don't want to block the script on the server.
         .listen(port, resolve);
     });
   }
 
-  async function runTest(browser, name) {
-    const url = `http://localhost:${port}/pkg/test.${name}.js/index.html`;
+  const port = await logStep('Getting available port', getPort());
+  await logStep(`Starting server on port ${port}`, startServer());
+  const browser = await logStep(`Starting browser`, puppeteer.launch());
+
+  async function runTest(name, url = `/pkg/${name}/index.html`) {
     const page = await browser.newPage();
     page.on('console', message => {
       console.log(`${name}: ${message.type()}: ${message.text()}`);
@@ -54,21 +49,18 @@ import getPort from 'get-port';
     const errorPromise = new Promise((_, reject) => {
       page.on('pageerror', reject);
     });
-    await page.goto(url);
+    await page.goto(`http://localhost:${port}${url}`);
     await Promise.race([page.waitForFunction('window.DONE'), errorPromise]);
     await page.close();
   }
 
-  const port = await logStep('Getting available port', getPort());
-  await logStep(`Starting server on port ${port}`, startServer());
-  const browser = await logStep(`Starting browser`, puppeteer.launch());
-
   console.log('Running tests...');
-  await Promise.all(
-    ['rollup', 'webpack' /*, 'parcel'*/].map(name =>
-      runTest(browser, name).catch(err => console.error(name, err))
+  await Promise.all([
+    runTest('no-bundler', '/index.html'),
+    ...['rollup', 'webpack' /*, 'parcel'*/].map(name =>
+      runTest(name).catch(err => console.error(name, err))
     )
-  );
+  ]);
 
   await logStep('Shutting down', browser.close());
 })().catch(err => {

@@ -19,6 +19,9 @@ use spmc::{channel, Receiver, Sender};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
 
+#[cfg(feature = "no-bundler")]
+use js_sys::JsString;
+
 // Naming is a workaround for https://github.com/rustwasm/wasm-bindgen/issues/2429
 // and https://github.com/rustwasm/wasm-bindgen/issues/1762.
 #[allow(non_camel_case_types)]
@@ -30,7 +33,8 @@ pub struct wbg_rayon_PoolBuilder {
     receiver: Receiver<rayon::ThreadBuilder>,
 }
 
-#[wasm_bindgen(module = "/src/workerHelpers.js")]
+#[cfg_attr(not(feature = "no-bundler"), wasm_bindgen(module = "/src/workerHelpers.js"))]
+#[cfg_attr(feature = "no-bundler", wasm_bindgen(module = "/src/workerHelpers.no-bundler.js"))]
 extern "C" {
     #[wasm_bindgen(js_name = startWorkers)]
     fn start_workers(module: JsValue, memory: JsValue, builder: wbg_rayon_PoolBuilder) -> Promise;
@@ -48,6 +52,18 @@ impl wbg_rayon_PoolBuilder {
             sender,
             receiver,
         }
+    }
+
+    #[cfg(feature = "no-bundler")]
+    #[wasm_bindgen(js_name = mainJS)]
+    pub fn main_js(&self) -> JsString {
+        #[wasm_bindgen]
+        extern {
+            #[wasm_bindgen(js_namespace = ["import", "meta"], js_name = url)]
+            static URL: JsString;
+        }
+
+        URL.clone()
     }
 
     #[wasm_bindgen(js_name = numThreads)]

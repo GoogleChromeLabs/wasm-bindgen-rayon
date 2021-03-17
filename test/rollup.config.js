@@ -19,7 +19,7 @@ import html from '@rollup/plugin-html';
 export default {
   input: './index.js',
   output: {
-    dir: 'pkg/test.rollup.js',
+    dir: 'pkg/rollup',
     format: 'esm',
     exports: 'named',
     name: 'rollupTest'
