@@ -51,11 +51,13 @@ The other issue is that the Rust standard library for the WebAssembly target is 
 
 Since we do want standard APIs like [`Mutex`, `Arc` and so on to work](https://doc.rust-lang.org/std/sync/), you'll need to use the nightly compiler toolchain and pass some flags to rebuild the standard library in addition to your own code.
 
+In order to reduce risk of breakages, it's strongly recommended to use a fixed nightly version. For example, the latest stable Rust at the moment of writing is version 1.50, which corresponds to `nightly-2021-02-11` and is known to work with this crate.
+
 ### Using config files
 
 The easiest way to configure those flags is:
 
-1. Put a string `nightly` in a `rust-toolchain` file in your project directory. This tells Rustup to use nightly toolchain by default for your project.
+1. Put a string `nightly-2021-02-11` in a `rust-toolchain` file in your project directory. This tells Rustup to use nightly toolchain by default for your project.
 2. Put the following in a `.cargo/config` file in your project directory:
 
    ```toml
@@ -82,7 +84,7 @@ In that case, the whole command looks like this:
 
 ```sh
 RUSTFLAGS='-C target-feature=+atomics,+bulk-memory' \
-	rustup run nightly \
+	rustup run nightly-2021-02-11 \
 	wasm-pack build --target web [...] \
 	-- -Z build-std=panic_abort,std
 ```
