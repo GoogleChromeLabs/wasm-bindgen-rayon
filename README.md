@@ -51,7 +51,7 @@ The other issue is that the Rust standard library for the WebAssembly target is 
 
 Since we do want standard APIs like [`Mutex`, `Arc` and so on to work](https://doc.rust-lang.org/std/sync/), you'll need to use the nightly compiler toolchain and pass some flags to rebuild the standard library in addition to your own code.
 
-In order to reduce risk of breakages, it's strongly recommended to use a fixed nightly version. For example, the latest stable Rust at the moment of writing is version 1.50, which corresponds to `nightly-2021-02-11` and is known to work with this crate.
+In order to reduce risk of breakages, it's strongly recommended to use a fixed nightly version. For example, the latest stable Rust at the moment of writing is version 1.50, which corresponds to `nightly-2021-02-11`, which was tested and works with this crate.
 
 ### Using config files
 
