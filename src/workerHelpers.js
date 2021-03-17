@@ -29,6 +29,17 @@ function waitForMsgType(target, type) {
 }
 
 waitForMsgType(self, 'wasm_bindgen_worker_init').then(async data => {
+  // # Note 1
+  // Our JS should have been generated in
+  // `[out-dir]/snippets/wasm-bindgen-rayon-[hash]/workerHelpers.js`,
+  // resolve the main module via `../../..`.
+  //
+  // This might need updating if the generated structure changes on wasm-bindgen
+  // side ever in the future, but works well with bundlers today. The whole
+  // point of this crate, after all, is to abstract away unstable features
+  // and temporary bugs so that you don't need to deal with them in your code.
+  //
+  // # Note 2
   // This could be a regular import, but then some bundlers complain about
   // circular deps.
   //
