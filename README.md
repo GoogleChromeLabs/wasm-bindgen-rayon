@@ -147,11 +147,11 @@ Note that, in addition to the earlier mentioned restrictions, this will work onl
 
 # Final caveats
 
-Check out caveats listed in the [wasm-bindgen threading docs](https://rustwasm.github.io/wasm-bindgen/examples/raytrace.html). While this library specifically targets Rayon and automatically provides the necessary shims for you, some of the caveats still apply.
+In order to use `SharedArrayBuffer` on the Web, you need to enable [cross-origin isolation policies](https://web.dev/coop-coep/). Check out the linked article for details.
 
-Most notably, even when you're using threads, the main thread is still going to be blocked while waiting for all the calculations to finish.
+Also check out caveats listed in the [wasm-bindgen threading docs](https://rustwasm.github.io/wasm-bindgen/examples/raytrace.html). While this library specifically targets Rayon and automatically provides the necessary shims for you, some of the caveats still apply.
 
-While this is usually not worse (if anything, quicker) than running same calculations without multithreading support, you should still seriously consider moving the main JS+Wasm to a dedicated Worker as well to avoid blocking UI altogether.
+Most notably, even when you're using threads, the main thread is still going to be blocked while waiting for all the calculations to finish. While this is usually not worse (if anything, quicker) than running same calculations without multithreading support, you should still seriously consider moving the main JS+Wasm to a dedicated Worker as well to avoid blocking UI altogether.
 
 # License
 
