@@ -127,7 +127,7 @@ wasm-bindgen-rayon provides the required JS code for those Workers internally, a
 
 ### Usage with Webpack
 
-If you're using Webpack v5 (version >= 5.25.1), you don't need to do anything special, as it already support [bundling Workers](https://webpack.js.org/guides/web-workers/) out of the box.
+If you're using Webpack v5 (version >= 5.25.1), you don't need to do anything special, as it already supports [bundling Workers](https://webpack.js.org/guides/web-workers/) out of the box.
 
 ### Usage with Rollup
 
