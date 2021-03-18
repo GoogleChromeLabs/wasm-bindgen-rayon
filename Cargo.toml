@@ -5,7 +5,7 @@ authors = ["Ingvar Stepanyan <rreverser@google.com>"]
 edition = "2018"
 license = "Apache-2.0"
 description = "Adapter for using Rayon-based concurrency on the Web"
-keywords = ["web", "thread", "parallel", "concurrency", "performance", "webassembly"]
+keywords = ["web", "thread", "parallel", "concurrency", "webassembly"]
 categories = ["concurrency", "webassembly", "web-programming"]
 readme = "README.md"
 
