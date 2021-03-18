@@ -8,6 +8,7 @@ description = "Adapter for using Rayon-based concurrency on the Web"
 keywords = ["web", "thread", "parallel", "concurrency", "webassembly"]
 categories = ["concurrency", "wasm", "web-programming"]
 readme = "README.md"
+exclude = [".github"]
 
 [dependencies]
 wasm-bindgen = "0.2"
