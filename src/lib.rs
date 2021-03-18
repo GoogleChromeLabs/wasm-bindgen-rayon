@@ -72,9 +72,6 @@ impl wbg_rayon_PoolBuilder {
     }
 
     pub fn receiver(&self) -> *const Receiver<rayon::ThreadBuilder> {
-        // Make sure it's safe to share Receiver with other Workers.
-        // This is a no-op compilation level check just to prevent issues
-        // when switching from crossbeam to a different channels implementation.
         &self.receiver
     }
 
