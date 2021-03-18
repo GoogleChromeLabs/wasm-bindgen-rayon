@@ -1,12 +1,12 @@
 [package]
 name = "wasm-bindgen-rayon"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Ingvar Stepanyan <rreverser@google.com>"]
 edition = "2018"
 license = "Apache-2.0"
 description = "Adapter for using Rayon-based concurrency on the Web"
 keywords = ["web", "thread", "parallel", "concurrency", "webassembly"]
-categories = ["concurrency", "webassembly", "web-programming"]
+categories = ["concurrency", "wasm", "web-programming"]
 readme = "README.md"
 
 [dependencies]

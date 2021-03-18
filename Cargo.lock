@@ -295,7 +295,7 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-rayon"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "js-sys",
  "rayon",
