@@ -19,8 +19,13 @@ You'll need to invoke it right after instantiating your module on the main threa
 ```js
 import init, { initThreadPool, /* ... */ } from './pkg/index.js';
 
+// Regular wasm-bindgen initialization.
 await init();
-await initThreadPool(navigator.hardwareConcurrency /* or any number of threads you want to dedicate to the Rayon threadpool */);
+
+// Thread pool initialization with the given number of threads
+// (pass `navigator.hardwareConcurrency` if you want to use all cores).
+await initThreadPool(navigator.hardwareConcurrency);
+
 // ...now you can invoke any exported functions as you normally would
 ```
 
