@@ -1,9 +1,8 @@
 `wasm-bindgen-rayon` is an adapter for enabling [Rayon](https://github.com/rayon-rs/rayon)-based concurrency on the Web with WebAssembly (via [wasm-bindgen](https://github.com/rustwasm/wasm-bindgen), Web Workers and SharedArrayBuffer support).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- param::isNotitle::true:: -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
+<!-- param::isNotitle::true:: -->
 
 - [Usage](#usage)
   - [Using Rayon](#using-rayon)
