@@ -24,7 +24,16 @@
 
 WebAssembly thread support is not yet a first-class citizen in Rust, so there are a few things to keep in mind when using this crate. Bear with me :)
 
-First of all, add this crate as a dependency to your `Cargo.toml` and reexport the `init_thread_pool` function:
+First of all, add this crate as a dependency to your `Cargo.toml` (in addition to `wasm-bindgen` and `rayon` themselves):
+
+```toml
+[dependencies]
+wasm-bindgen = "0.2"
+rayon = "1.5"
+wasm-bindgen-rayon = "1.0"
+```
+
+Then, reexport the `init_thread_pool` function:
 
 ```rust
 pub use wasm_bindgen_rayon::init_thread_pool;
@@ -161,7 +170,11 @@ For Rollup, you'll need [`@surma/rollup-plugin-off-main-thread`](https://github.
 
 The default JS glue was designed in a way that works great with bundlers and code-splitting, but, sadly, not yet in browsers due to different treatment of import paths (see [`WICG/import-maps#244`](https://github.com/WICG/import-maps/issues/244) which might help unify those in the future).
 
-If you want to build this library for usage without bundlers, enable `no-bundler` feature for `wasm-bindgen-rayon` in your `Cargo.toml`.
+If you want to build this library for usage without bundlers, enable the `no-bundler` feature for `wasm-bindgen-rayon` in your `Cargo.toml`:
+
+```toml
+wasm-bindgen-rayon = { version = "1.0", features = ["no-bundler"] }
+```
 
 Note that, in addition to the earlier mentioned restrictions, this will work only in browsers with [support for Module Workers](https://caniuse.com/mdn-api_worker_worker_ecmascript_modules) (when using bundlers, those are bundled to regular Workers automatically).
 
