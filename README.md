@@ -5,6 +5,7 @@
 <!-- param::isNotitle::true:: -->
 
 - [Usage](#usage)
+  - [Setting up](#setting-up)
   - [Using Rayon](#using-rayon)
   - [Building Rust code](#building-rust-code)
     - [Using config files](#using-config-files)
