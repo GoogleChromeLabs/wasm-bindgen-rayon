@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 
+import { threads } from 'wasm-feature-detect';
+
 const maxIterations = 1000;
 
 const canvas = document.getElementById('canvas');
@@ -28,14 +30,21 @@ wasmWorker.onmessage = ({ data: { rawImageData, time } }) => {
   ctx.putImageData(imgData, 0, 0);
 };
 
-function btnHandler(event) {
-  wasmWorker.postMessage({
-    type: event.target.id,
-    width,
-    height,
-    maxIterations
-  });
-}
+const btnProps = {
+  onclick(event) {
+    wasmWorker.postMessage({
+      type: event.target.id,
+      width,
+      height,
+      maxIterations
+    });
+  },
+  disabled: false
+};
 
-document.getElementById('singleThread').onclick = btnHandler;
-document.getElementById('multiThread').onclick = btnHandler;
+Object.assign(document.getElementById('singleThread'), btnProps);
+
+threads().then(supportsThreads => {
+  if (!supportsThreads) return;
+  Object.assign(document.getElementById('multiThread'), btnProps);
+});

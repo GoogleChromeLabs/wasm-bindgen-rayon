@@ -12,5 +12,8 @@
     "wasm-pack": "^0.9.1",
     "webpack": "^5.25.1",
     "webpack-cli": "^4.5.0"
+  },
+  "dependencies": {
+    "wasm-feature-detect": "^1.2.10"
   }
 }
