@@ -11,40 +11,31 @@
  * limitations under the License.
  */
 
-import * as singleThread from './pkg/wasm_bindgen_rayon_demo.js';
-import * as multiThread from './pkg-parallel/wasm_bindgen_rayon_demo.js';
-
 const maxIterations = 1000;
 
 const canvas = document.getElementById('canvas');
 const { width, height } = canvas;
 const ctx = canvas.getContext('2d');
+const timeOutput = document.getElementById('time');
 
-const time = document.getElementById('time');
+const wasmWorker = new Worker(new URL('./wasm-worker.js', import.meta.url), {
+  type: 'module'
+});
 
-async function wrapGenerate(buttonId, asyncInit) {
-  const generate = await asyncInit();
-  const btn = document.getElementById(buttonId);
+wasmWorker.onmessage = ({ data: { rawImageData, time } }) => {
+  timeOutput.value = `${time.toFixed(2)} ms`;
+  const imgData = new ImageData(rawImageData, width, height);
+  ctx.putImageData(imgData, 0, 0);
+};
 
-  btn.onclick = () => {
-    const start = performance.now();
-    const rawImageData = generate(width, height, maxIterations);
-    const end = performance.now();
-    time.value = `${(end - start).toFixed(2)} ms`;
-    const imgData = new ImageData(rawImageData, width, height);
-    ctx.putImageData(imgData, 0, 0);
-  };
-
-  btn.disabled = false;
+function btnHandler(event) {
+  wasmWorker.postMessage({
+    type: event.target.id,
+    width,
+    height,
+    maxIterations
+  });
 }
 
-wrapGenerate('singleThread', async () => {
-  await singleThread.default();
-  return singleThread.generate;
-});
-
-wrapGenerate('multiThread', async () => {
-  await multiThread.default();
-  await multiThread.initThreadPool(navigator.hardwareConcurrency);
-  return multiThread.generate;
-});
+document.getElementById('singleThread').onclick = btnHandler;
+document.getElementById('multiThread').onclick = btnHandler;

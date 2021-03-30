@@ -1,0 +1,25 @@
+name: Demo
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build demo
+      working-directory: ./demo
+      run: |
+        rustup component add rust-src
+        npm ci
+        ./build.sh
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@3.6.2
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages # The branch the action should deploy to.
+        FOLDER: demo/dist # The folder the action should deploy.

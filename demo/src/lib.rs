@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 use hsl::HSL;
 use num_complex::Complex64;
 use rand::Rng;
@@ -38,7 +37,7 @@ impl Generator {
             width,
             height,
             palette: (0..max_iterations)
-                .map(|_| {
+                .map(move |_| {
                     let (r, g, b) = HSL {
                         h: rng.gen_range(0.0..360.0),
                         s: 0.5,
@@ -68,24 +67,33 @@ impl Generator {
         }
         &self.palette[i]
     }
+
+    fn iter_row_bytes(&self, y: u32) -> impl '_ + Iterator<Item = u8> {
+        (0..self.width)
+            .flat_map(move |x| self.get_color(x, y))
+            .copied()
+    }
+
+    // Multi-threaded implementation.
+    #[cfg(feature = "rayon")]
+    fn iter_bytes(&self) -> impl '_ + ParallelIterator<Item = u8> {
+        (0..self.height)
+            .into_par_iter()
+            .flat_map_iter(move |y| self.iter_row_bytes(y))
+    }
+
+    // Single-threaded implementation.
+    #[cfg(not(feature = "rayon"))]
+    fn iter_bytes(&self) -> impl '_ + Iterator<Item = u8> {
+        (0..self.height).flat_map(move |y| self.iter_row_bytes(y))
+    }
 }
 
 #[wasm_bindgen]
 pub fn generate(width: u32, height: u32, max_iterations: u32) -> Clamped<Vec<u8>> {
-    let generator = &Generator::new(width, height, max_iterations);
-
-    #[cfg(feature = "rayon")]
-    let raw_img_data = (0..height)
-        .into_par_iter()
-        .flat_map_iter(|y| (0..width).flat_map(move |x| generator.get_color(x, y)))
-        .copied()
-        .collect();
-
-    #[cfg(not(feature = "rayon"))]
-    let raw_img_data = (0..height)
-        .flat_map(|y| (0..width).flat_map(move |x| generator.get_color(x, y)))
-        .copied()
-        .collect();
-
-    Clamped(raw_img_data)
+    Clamped(
+        Generator::new(width, height, max_iterations)
+            .iter_bytes()
+            .collect(),
+    )
 }

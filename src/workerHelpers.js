@@ -65,34 +65,30 @@ export async function startWorkers(module, memory, builder) {
     receiver: builder.receiver()
   };
 
-  try {
-    await Promise.all(
-      Array.from({ length: builder.numThreads() }, () => {
-        // Self-spawn into a new Worker.
-        //
-        // TODO: while `new URL('...', import.meta.url) becomes a semi-standard
-        // way to get asset URLs relative to the module across various bundlers
-        // and browser, ideally we should switch to `import.meta.resolve`
-        // once it becomes a standard.
-        //
-        // Note: we could use `../../..` as the URL here to inline workerHelpers.js
-        // into the parent entry instead of creating another split point -
-        // this would be preferable from optimization perspective -
-        // however, Webpack then eliminates all message handler code
-        // because wasm-pack produces "sideEffects":false in package.json
-        // unconditionally.
-        //
-        // The only way to work around that is to have side effect code
-        // in an entry point such as Worker file itself.
-        const worker = new Worker(new URL('./workerHelpers.js', import.meta.url), {
-          type: 'module'
-        });
-        worker.postMessage(workerInit);
-        return waitForMsgType(worker, 'wasm_bindgen_worker_ready');
-      })
-    );
-    builder.build();
-  } finally {
-    builder.free();
-  }
+  await Promise.all(
+    Array.from({ length: builder.numThreads() }, () => {
+      // Self-spawn into a new Worker.
+      //
+      // TODO: while `new URL('...', import.meta.url) becomes a semi-standard
+      // way to get asset URLs relative to the module across various bundlers
+      // and browser, ideally we should switch to `import.meta.resolve`
+      // once it becomes a standard.
+      //
+      // Note: we could use `../../..` as the URL here to inline workerHelpers.js
+      // into the parent entry instead of creating another split point -
+      // this would be preferable from optimization perspective -
+      // however, Webpack then eliminates all message handler code
+      // because wasm-pack produces "sideEffects":false in package.json
+      // unconditionally.
+      //
+      // The only way to work around that is to have side effect code
+      // in an entry point such as Worker file itself.
+      const worker = new Worker(new URL('./workerHelpers.js', import.meta.url), {
+        type: 'module'
+      });
+      worker.postMessage(workerInit);
+      return waitForMsgType(worker, 'wasm_bindgen_worker_ready');
+    })
+  );
+  builder.build();
 }
