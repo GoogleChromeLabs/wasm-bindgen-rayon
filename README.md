@@ -25,6 +25,8 @@
 
 WebAssembly thread support is not yet a first-class citizen in Rust, so there are a few things to keep in mind when using this crate. Bear with me :)
 
+For a quick demo, check out https://rreverser.com/wasm-bindgen-rayon-demo/.
+
 ## Setting up
 
 First of all, add this crate as a dependency to your `Cargo.toml` (in addition to `wasm-bindgen` and `rayon` themselves):
