@@ -81,7 +81,7 @@ impl wbg_rayon_PoolBuilder {
     pub fn build(&mut self) {
         rayon::ThreadPoolBuilder::new()
             .num_threads(self.num_threads)
-            // We could use postMessage here instead of crossbeam channels,
+            // We could use postMessage here instead of Rust channels,
             // but currently we can't due to a Chrome bug that will cause
             // the main thread to lock up before it even sends the message:
             // https://bugs.chromium.org/p/chromium/issues/detail?id=1075645
