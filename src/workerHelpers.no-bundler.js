@@ -31,6 +31,15 @@ waitForMsgType(self, 'wasm_bindgen_worker_init').then(async data => {
   pkg.wbg_rayon_start_worker(data.receiver);
 });
 
+// Note: this is never used, but necessary to prevent a bug in Firefox
+// (https://bugzilla.mozilla.org/show_bug.cgi?id=1702191) where it collects
+// Web Workers that have a shared WebAssembly memory with the main thread,
+// but are not explicitly rooted via a `Worker` instance.
+//
+// By storing them in a variable, we can keep `Worker` objects around and
+// prevent them from getting GC-d.
+let _workers;
+
 export async function startWorkers(module, memory, builder) {
   const workerInit = {
     type: 'wasm_bindgen_worker_init',
@@ -40,19 +49,16 @@ export async function startWorkers(module, memory, builder) {
     mainJS: builder.mainJS()
   };
 
-  try {
-    await Promise.all(
-      Array.from({ length: builder.numThreads() }, () => {
-        // Self-spawn into a new Worker.
-        const worker = new Worker(import.meta.url, {
-          type: 'module'
-        });
-        worker.postMessage(workerInit);
-        return waitForMsgType(worker, 'wasm_bindgen_worker_ready');
-      })
-    );
-    builder.build();
-  } finally {
-    builder.free();
-  }
+  _workers = await Promise.all(
+    Array.from({ length: builder.numThreads() }, async () => {
+      // Self-spawn into a new Worker.
+      const worker = new Worker(import.meta.url, {
+        type: 'module'
+      });
+      worker.postMessage(workerInit);
+      await waitForMsgType(worker, 'wasm_bindgen_worker_ready');
+      return worker;
+    })
+  );
+  builder.build();
 }
