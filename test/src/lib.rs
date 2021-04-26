@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 pub use wasm_bindgen_rayon::init_thread_pool;
 
 use rayon::prelude::*;

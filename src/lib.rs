@@ -1,5 +1,12 @@
-#![cfg_attr(feature = "nightly", feature(external_doc), doc(include = "../README.md"))]
-#![cfg_attr(not(feature = "nightly"), doc = "Check out documentation in [README.md](https://github.com/GoogleChromeLabs/wasm-bindgen-rayon).")]
+#![cfg_attr(
+    feature = "nightly",
+    feature(external_doc),
+    doc(include = "../README.md")
+)]
+#![cfg_attr(
+    not(feature = "nightly"),
+    doc = "Check out documentation in [README.md](https://github.com/GoogleChromeLabs/wasm-bindgen-rayon)."
+)]
 
 /**
  * Copyright 2021 Google Inc. All Rights Reserved.
@@ -13,7 +20,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 use js_sys::Promise;
 use spmc::{channel, Receiver, Sender};
 use wasm_bindgen::prelude::*;
@@ -33,8 +39,14 @@ pub struct wbg_rayon_PoolBuilder {
     receiver: Receiver<rayon::ThreadBuilder>,
 }
 
-#[cfg_attr(not(feature = "no-bundler"), wasm_bindgen(module = "/src/workerHelpers.js"))]
-#[cfg_attr(feature = "no-bundler", wasm_bindgen(module = "/src/workerHelpers.no-bundler.js"))]
+#[cfg_attr(
+    not(feature = "no-bundler"),
+    wasm_bindgen(module = "/src/workerHelpers.js")
+)]
+#[cfg_attr(
+    feature = "no-bundler",
+    wasm_bindgen(module = "/src/workerHelpers.no-bundler.js")
+)]
 extern "C" {
     #[wasm_bindgen(js_name = startWorkers)]
     fn start_workers(module: JsValue, memory: JsValue, builder: wbg_rayon_PoolBuilder) -> Promise;
@@ -43,9 +55,6 @@ extern "C" {
 #[wasm_bindgen]
 impl wbg_rayon_PoolBuilder {
     fn new(num_threads: usize) -> Self {
-        // 0 means that sender will block until receiver takes a message.
-        // We can use it because all the threads are spawned and ready to accept
-        // messages by the time we call `build()` to instantiate spawn handler.
         let (sender, receiver) = channel();
         Self {
             num_threads,
@@ -58,7 +67,7 @@ impl wbg_rayon_PoolBuilder {
     #[wasm_bindgen(js_name = mainJS)]
     pub fn main_js(&self) -> JsString {
         #[wasm_bindgen]
-        extern {
+        extern "C" {
             #[wasm_bindgen(js_namespace = ["import", "meta"], js_name = url)]
             static URL: JsString;
         }
@@ -86,6 +95,9 @@ impl wbg_rayon_PoolBuilder {
             // the main thread to lock up before it even sends the message:
             // https://bugs.chromium.org/p/chromium/issues/detail?id=1075645
             .spawn_handler(move |thread| {
+                // Note: `send` will return an error if there are no receivers.
+                // We can use it because all the threads are spawned and ready to accept
+                // messages by the time we call `build()` to instantiate spawn handler.
                 self.sender.send(thread).unwrap_throw();
                 Ok(())
             })
