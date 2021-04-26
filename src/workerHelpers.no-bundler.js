@@ -52,9 +52,15 @@ export async function startWorkers(module, memory, builder) {
   _workers = await Promise.all(
     Array.from({ length: builder.numThreads() }, async () => {
       // Self-spawn into a new Worker.
-      const worker = new Worker(import.meta.url, {
+      // The script is fetched as a blob so it works even if this script is
+      // hosted remotely (e.g. on a CDN). This avoids a cross-origin
+      // security error.
+      let scriptBlob = await fetch(import.meta.url).then(r => r.blob());
+      let url = URL.createObjectURL(scriptBlob);
+      const worker = new Worker(url, {
         type: 'module'
       });
+      URL.revokeObjectURL(url);
       worker.postMessage(workerInit);
       await waitForMsgType(worker, 'wasm_bindgen_worker_ready');
       return worker;
