@@ -55,7 +55,12 @@ export async function startWorkers(module, memory, builder) {
       const worker = new Worker(import.meta.url, {
         type: 'module'
       });
-      worker.postMessage(workerInit);
+      try {
+        worker.postMessage(workerInit);
+      } catch(e) {
+        console.warn("Have you added the `.cargo/config` and `rust-toolchain` files as explained in the wasm-bindgen-rayon readme?");
+        throw new Error(e);
+      }
       await waitForMsgType(worker, 'wasm_bindgen_worker_ready');
       return worker;
     })
