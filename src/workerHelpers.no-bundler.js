@@ -60,9 +60,9 @@ export async function startWorkers(module, memory, builder) {
       const worker = new Worker(url, {
         type: 'module'
       });
-      URL.revokeObjectURL(url);
       worker.postMessage(workerInit);
       await waitForMsgType(worker, 'wasm_bindgen_worker_ready');
+      URL.revokeObjectURL(url);
       return worker;
     })
   );
