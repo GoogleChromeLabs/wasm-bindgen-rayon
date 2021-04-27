@@ -8,6 +8,12 @@
     doc = "Check out documentation in [README.md](https://github.com/GoogleChromeLabs/wasm-bindgen-rayon)."
 )]
 
+// Note: `atomics` is whitelisted in `target_feature` detection, but `bulk-memory` isn't,
+// so we can check only presence of the former. This should be enough to catch most common
+// mistake (forgetting to pass `RUSTFLAGS` altogether).
+#[cfg(not(target_feature = "atomics"))]
+compile_error!("Did you forget to enable `atomics` and `bulk-memory` features as outlined in wasm-bindgen-rayon README?");
+
 /**
  * Copyright 2021 Google Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
