@@ -5,6 +5,7 @@
 <!-- param::isNotitle::true:: -->
 
 - [Usage](#usage)
+  - [Caveats](#caveats)
   - [Setting up](#setting-up)
   - [Using Rayon](#using-rayon)
   - [Building Rust code](#building-rust-code)
@@ -16,7 +17,6 @@
     - [Usage with Rollup](#usage-with-rollup)
     - [Usage with Parcel](#usage-with-parcel)
     - [Usage without bundlers](#usage-without-bundlers)
-- [Final caveats](#final-caveats)
 - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
