@@ -27,7 +27,19 @@ WebAssembly thread support is not yet a first-class citizen in Rust, so there ar
 
 For a quick demo, check out https://rreverser.com/wasm-bindgen-rayon-demo/.
 
+## Caveats
+
+Before we get started, check out caveats listed in the [wasm-bindgen threading docs](https://rustwasm.github.io/wasm-bindgen/examples/raytrace.html). While this library specifically targets Rayon and automatically provides the necessary shims for you, some of the caveats still apply.
+
+Most notably, even when you're using multithreading, the main thread still **can't be blocked** while waiting for the Rayon pool to get ready or for all the background operations to finish.
+
+You must instantiate the main JS+Wasm in a dedicated `Worker` to avoid blocking the main thread - that is, don't mix UI and Rayon code together. Instead, use a library like [Comlink](https://github.com/GoogleChromeLabs/comlink) or a custom glue code to expose required wasm-bindgen methods to the main thread, and do the UI work from there.
+
+Note: Chrome currently does allow blocking on the main thread, but it's a [bug](https://bugs.chromium.org/p/chromium/issues/detail?id=1190951) that's going to be fixed soon.
+
 ## Setting up
+
+First of all, in order to use `SharedArrayBuffer` on the Web, you need to enable [cross-origin isolation policies](https://web.dev/coop-coep/). Check out the linked article for details.
 
 First of all, add this crate as a dependency to your `Cargo.toml` (in addition to `wasm-bindgen` and `rayon` themselves):
 
@@ -51,7 +63,7 @@ This will expose an async `initThreadPool` function in the final generated JavaS
 You'll need to invoke it right after instantiating your module on the main thread in order to prepare the threadpool before calling into actual library functions:
 
 ```js
-import init, { initThreadPool, /* ... */ } from './pkg/index.js';
+import init, { initThreadPool /* ... */ } from './pkg/index.js';
 
 // Regular wasm-bindgen initialization.
 await init();
@@ -84,6 +96,7 @@ First limitation to note is that you'll have to use `wasm-bindgen`/`wasm-pack`'s
 <summary><i>Why?</i></summary>
 
 This is because the Wasm code needs to take its own object (the `WebAssembly.Module`) and share it with other threads when spawning them. This object is only accessible from the `--target web` and `--target no-modules` outputs, but we further restrict it to only `--target web` as we also use [JS snippets feature](https://rustwasm.github.io/wasm-bindgen/reference/js-snippets.html).
+
 </details>
 
 The other issue is that the Rust standard library for the WebAssembly target is built without threads support to ensure maximum portability.
@@ -142,12 +155,12 @@ import { threads } from 'wasm-feature-detect';
 let wasmPkg;
 
 if (await threads()) {
-	wasmPkg = await import('./pkg-with-threads/index.js');
-	await wasmPkg.default();
-	await wasmPkg.initThreadPool(navigator.hardwareConcurrency);
+  wasmPkg = await import('./pkg-with-threads/index.js');
+  await wasmPkg.default();
+  await wasmPkg.initThreadPool(navigator.hardwareConcurrency);
 } else {
-	wasmPkg = await import('./pkg-without-threads/index.js');
-	await wasmPkg.default();
+  wasmPkg = await import('./pkg-without-threads/index.js');
+  await wasmPkg.default();
 }
 
 wasmPkg.nowCallAnyExportedFuncs();
@@ -169,7 +182,7 @@ For Rollup, you'll need [`@surma/rollup-plugin-off-main-thread`](https://github.
 
 ### Usage with Parcel
 
-*[Coming soon...]* Parcel v2 also recognises the used syntax, but it's still in development and there are some minor issues to fix before it can be used with this crate.
+_[Coming soon...]_ Parcel v2 also recognises the used syntax, but it's still in development and there are some minor issues to fix before it can be used with this crate.
 
 ### Usage without bundlers
 
@@ -182,14 +195,6 @@ wasm-bindgen-rayon = { version = "1.0", features = ["no-bundler"] }
 ```
 
 Note that, in addition to the earlier mentioned restrictions, this will work only in browsers with [support for Module Workers](https://caniuse.com/mdn-api_worker_worker_ecmascript_modules) (when using bundlers, those are bundled to regular Workers automatically).
-
-# Final caveats
-
-In order to use `SharedArrayBuffer` on the Web, you need to enable [cross-origin isolation policies](https://web.dev/coop-coep/). Check out the linked article for details.
-
-Also check out caveats listed in the [wasm-bindgen threading docs](https://rustwasm.github.io/wasm-bindgen/examples/raytrace.html). While this library specifically targets Rayon and automatically provides the necessary shims for you, some of the caveats still apply.
-
-Most notably, even when you're using threads, the main thread still can't be blocked while waiting for the Rayon pool to get ready or for all the calculations to finish. You need to instantiate the main JS+Wasm in a dedicated Worker to avoid blocking the UI altogether.
 
 # License
 
