@@ -194,7 +194,7 @@ If you want to build this library for usage without bundlers, enable the `no-bun
 wasm-bindgen-rayon = { version = "1.0", features = ["no-bundler"] }
 ```
 
-Note that, in addition to the earlier mentioned restrictions, this will work only in browsers with [support for Module Workers](https://caniuse.com/mdn-api_worker_worker_ecmascript_modules) (when using bundlers, those are bundled to regular Workers automatically).
+Note that, in addition to the earlier mentioned restrictions, this will work out of the box only in browsers with [support for Module Workers](https://caniuse.com/mdn-api_worker_worker_ecmascript_modules). To ensure that it works in all browsers, either bundle your code for production, or include [module-workers-polyfill](https://unpkg.com/module-workers-polyfill) on the same page.
 
 # License
 
