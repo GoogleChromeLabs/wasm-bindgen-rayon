@@ -12,6 +12,7 @@
  */
 
 import { threads } from 'wasm-feature-detect';
+import * as Comlink from 'comlink';
 
 const maxIterations = 1000;
 
@@ -20,24 +21,22 @@ const { width, height } = canvas;
 const ctx = canvas.getContext('2d');
 const timeOutput = document.getElementById('time');
 
-const wasmWorker = new Worker(new URL('./wasm-worker.js', import.meta.url), {
+// Create a separate thread from wasm-worker.js and get a proxy to its `generate` function.
+const generate = Comlink.wrap(new Worker(new URL('./wasm-worker.js', import.meta.url), {
   type: 'module'
-});
-
-wasmWorker.onmessage = ({ data: { rawImageData, time } }) => {
-  timeOutput.value = `${time.toFixed(2)} ms`;
-  const imgData = new ImageData(rawImageData, width, height);
-  ctx.putImageData(imgData, 0, 0);
-};
+}));
 
 const btnProps = {
-  onclick(event) {
-    wasmWorker.postMessage({
+  async onclick(event) {
+    let { rawImageData, time } = await generate({
       type: event.target.id,
       width,
       height,
       maxIterations
     });
+    timeOutput.value = `${time.toFixed(2)} ms`;
+    const imgData = new ImageData(rawImageData, width, height);
+    ctx.putImageData(imgData, 0, 0);
   },
   disabled: false
 };

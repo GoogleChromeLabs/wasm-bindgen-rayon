@@ -1,4 +1,6 @@
-const generators = {
+import * as Comlink from 'comlink';
+
+let handlers = {
   singleThread: (async () => {
     const singleThread = await import('./pkg/wasm_bindgen_rayon_demo.js');
     await singleThread.default();
@@ -15,10 +17,17 @@ const generators = {
   })()
 };
 
-onmessage = async ({ data: { type, width, height, maxIterations } }) => {
-  const generator = await generators[type];
+async function generate({ type, width, height, maxIterations }) {
+  const generator = await handlers[type];
+  // Doing time measurement on the worker thread to avoid measuring cost of communication.
   const start = performance.now();
   const rawImageData = generator.generate(width, height, maxIterations);
   const time = performance.now() - start;
-  postMessage({ rawImageData, time }, [rawImageData.buffer]);
-};
+  return {
+    rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),
+    time
+  };
+}
+
+// Expose the `generate` function to the main thread.
+Comlink.expose(generate);
