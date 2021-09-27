@@ -57,7 +57,7 @@ import { promises as fs } from 'fs';
   console.log('Running tests...');
   await Promise.all([
     runTest('no-bundler', '/index.html'),
-    ...['rollup', 'webpack' /*, 'parcel'*/].map(name =>
+    ...['rollup', 'webpack', 'parcel'].map(name =>
       runTest(name).catch(err => console.error(name, err))
     )
   ]);

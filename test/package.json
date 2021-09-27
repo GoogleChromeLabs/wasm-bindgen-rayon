@@ -6,6 +6,7 @@
 		"@web/rollup-plugin-import-meta-assets": "^1.0.4",
 		"get-port": "^5.1.1",
 		"html-webpack-plugin": "^5.2.0",
+		"parcel": "^2.0.0-rc.0",
 		"puppeteer": "^7.0.0",
 		"requirejs": "^2.3.6",
 		"rollup": "^2.38.4",
@@ -22,7 +23,7 @@
 	},
 	"scripts": {
 		"build:wasm": "wasm-pack build --target web --out-name test",
-		"build:bundler": "npm run build:wasm && webpack && rollup -c",
+		"build:bundler": "npm run build:wasm && webpack && rollup -c && parcel build index.html --dist-dir pkg/parcel --public-url .",
 		"build:no-bundler": "npm run build:wasm -- -- --features wasm-bindgen-rayon/no-bundler",
 		"build": "npm run build:bundler && npm run build:no-bundler",
 		"pretest": "npm run build",

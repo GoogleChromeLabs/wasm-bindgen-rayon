@@ -168,7 +168,7 @@ wasmPkg.nowCallAnyExportedFuncs();
 
 WebAssembly threads use Web Workers under the hood for instantiating other threads with the same WebAssembly module & memory.
 
-wasm-bindgen-rayon provides the required JS code for those Workers internally, and uses a syntax that is recognised across various bundlers.
+wasm-bindgen-rayon provides the required JS code for those Workers internally, and [uses a syntax that is recognised across various bundlers](https://web.dev/bundling-non-js-resources/).
 
 ### Usage with Webpack
 
@@ -180,7 +180,7 @@ For Rollup, you'll need [`@surma/rollup-plugin-off-main-thread`](https://github.
 
 ### Usage with Parcel
 
-_[Coming soon...]_ Parcel v2 also recognises the used syntax, but it's still in development and there are some minor issues to fix before it can be used with this crate.
+The upcoming Parcel v2 also recognises the used syntax and supports WebAssembly and Worker bundling, so should work out of the box.
 
 ### Usage without bundlers
 
