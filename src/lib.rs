@@ -30,8 +30,6 @@ use js_sys::Promise;
 use spmc::{channel, Receiver, Sender};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
-
-#[cfg(feature = "no-bundler")]
 use js_sys::JsString;
 
 // Naming is a workaround for https://github.com/rustwasm/wasm-bindgen/issues/2429
@@ -115,6 +113,10 @@ impl wbg_rayon_PoolBuilder {
 #[wasm_bindgen(js_name = initThreadPool)]
 #[doc(hidden)]
 pub fn init_thread_pool(num_threads: usize) -> Promise {
+    if num_threads == 0 {
+        return Promise::reject(&JsValue::from_str("num_threads must be > 0"));
+    }
+
     start_workers(
         wasm_bindgen::module(),
         wasm_bindgen::memory(),
