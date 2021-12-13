@@ -30,6 +30,8 @@ use js_sys::Promise;
 use spmc::{channel, Receiver, Sender};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
+
+#[cfg(feature = "no-bundler")]
 use js_sys::JsString;
 
 // Naming is a workaround for https://github.com/rustwasm/wasm-bindgen/issues/2429
