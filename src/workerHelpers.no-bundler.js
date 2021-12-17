@@ -41,6 +41,10 @@ waitForMsgType(self, 'wasm_bindgen_worker_init').then(async data => {
 let _workers;
 
 export async function startWorkers(module, memory, builder) {
+  if (builder.numThreads() === 0) {
+    throw new Error(`num_threads must be > 0.`);
+  }
+
   const workerInit = {
     type: 'wasm_bindgen_worker_init',
     module,
