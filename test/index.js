@@ -11,19 +11,6 @@
  * limitations under the License.
  */
 
-import init, { initThreadPool, sum } from './pkg/test.js';
-
-async function runTest() {
-  await init();
-  await initThreadPool(navigator.hardwareConcurrency);
-  // 1...10
-  let arr = Int32Array.from({ length: 10 }, (_, i) => i + 1);
-  if (sum(arr) !== 55) {
-    throw new Error('Wrong result.');
-  }
-  console.log('OK');
-}
-
-runTest().then(() => {
+new Worker(new URL('./index.worker.js', import.meta.url), { type: 'module' }).addEventListener('message', () => {
   globalThis.DONE = true;
 });
