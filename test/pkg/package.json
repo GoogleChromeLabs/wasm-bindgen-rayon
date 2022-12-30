@@ -1,0 +1,16 @@
+{
+  "name": "wasm-bindgen-rayon-test",
+  "collaborators": [
+    "Ingvar Stepanyan <rreverser@google.com>"
+  ],
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "files": [
+    "test_bg.wasm",
+    "test.js",
+    "test.d.ts"
+  ],
+  "module": "test.js",
+  "types": "test.d.ts",
+  "sideEffects": false
+}
