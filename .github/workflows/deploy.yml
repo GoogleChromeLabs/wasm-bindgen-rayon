@@ -14,8 +14,8 @@ jobs:
     - name: Build demo
       working-directory: ./demo
       run: |
-        rustup toolchain add nightly-2022-04-07
-        rustup component add rust-src --toolchain nightly-2022-04-07
+        rustup toolchain add nightly-2022-12-12
+        rustup component add rust-src --toolchain nightly-2022-12-12
         npm ci
         npm run build
     - name: Deploy 🚀
