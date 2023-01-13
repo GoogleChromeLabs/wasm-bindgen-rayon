@@ -1,5 +1,4 @@
 import { threads } from 'wasm-feature-detect';
-import * as Comlink from 'comlink';
 
 // Wrap wasm-bindgen exports (the `generate` function) to add time measurement.
 function wrapExports({ generate }) {
@@ -7,16 +6,15 @@ function wrapExports({ generate }) {
     const start = performance.now();
     const rawImageData = generate(width, height, maxIterations);
     const time = performance.now() - start;
-    return {
-      // Little perf boost to transfer data to the main thread w/o copying.
-      rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),
+    return [{
+      rawImageData,
       time
-    };
+    }, [rawImageData.buffer]];
   };
 }
 
-async function initHandlers() {
-  let [singleThread, multiThread] = await Promise.all([
+const exposedPromise = (async () => {
+  const [singleThread, multiThread] = await Promise.all([
     (async () => {
       const singleThread = await import('./pkg/wasm_bindgen_rayon_demo.js');
       await singleThread.default();
@@ -36,13 +34,22 @@ async function initHandlers() {
     })()
   ]);
 
-  return Comlink.proxy({
+  const exposed = {
     singleThread,
-    supportsThreads: !!multiThread,
-    multiThread
-  });
-}
+    supportsThreads: () => ['multiThread' in exposed],
+    getKeys: () => [Object.keys(exposed)],
+  }
 
-Comlink.expose({
-  handlers: initHandlers()
+  if (multiThread) exposed.multiThread = multiThread;
+
+  return exposed;
+})();
+
+addEventListener('message', async (event) => {
+  const exposed = await exposedPromise;
+  if (!(event.data.action in exposed)) return;
+  const action = exposed[event.data.action];
+  const result = await action(...(event.data.args || []));
+  event.data.reply.postMessage(...result);
 });
+

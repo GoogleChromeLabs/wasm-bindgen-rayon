@@ -11,8 +11,6 @@
  * limitations under the License.
  */
 
-import * as Comlink from 'comlink';
-
 const maxIterations = 1000;
 
 const canvas = document.getElementById('canvas');
@@ -21,23 +19,33 @@ const ctx = canvas.getContext('2d');
 const timeOutput = document.getElementById('time');
 const threadInput = document.getElementById('thread-count');
 
+
+async function callInWorker(worker, action, args) {
+  const channel = new MessageChannel();
+  const reply = channel.port1;
+  const result = new Promise((resolve) => {
+    channel.port2.onmessage = (event) => {
+      resolve(event.data);
+      channel.port2.close();
+    }
+  });
+  worker.postMessage({ action, args, reply }, [reply]);
+  return result;
+}
+
 (async function init() {
-  // Create a separate thread from wasm-worker.js and get a proxy to its handlers.
-  let handlers = await Comlink.wrap(
-    new Worker(new URL('./wasm-worker.js', import.meta.url), {
-      type: 'module'
-    })
-  ).handlers;
+  const worker = new Worker(new URL('./wasm-worker.js', import.meta.url), {
+    type: 'module'
+  });
+
+  const handlerKeys = await callInWorker(worker, 'getKeys');
 
   function setupBtn(id) {
-    // Handlers are named in the same way as buttons.
-    let handler = handlers[id];
     // If handler doesn't exist, it's not supported.
-    if (!handler) return;
+    if (!handlerKeys.includes(id)) return;
     // Assign onclick handler + enable the button.
     Object.assign(document.getElementById(id), {
       async onclick() {
-        let thisHandler = handler;
         let tmpWorker;
 
         // Super hacky, but create a new worker for multi-threaded version
@@ -49,25 +57,29 @@ const threadInput = document.getElementById('thread-count');
             // but Webpack is making assumptions about the source that prevent that.
             name: `threads=${threadInput.value}`
           });
-          thisHandler = (await Comlink.wrap(tmpWorker).handlers)[id];
         }
 
-        let { rawImageData, time } = await thisHandler({
+        const { rawImageData, time } = await callInWorker(tmpWorker || worker, id, [{
           width,
           height,
           maxIterations
-        });
+        }]);
+
         timeOutput.value = `${time.toFixed(2)} ms`;
         const imgData = new ImageData(rawImageData, width, height);
         ctx.putImageData(imgData, 0, 0);
-        if (tmpWorker) tmpWorker.terminate();
+
+        if (tmpWorker) {
+          console.log('terminating worker');
+          tmpWorker.terminate();
+        }
       },
       disabled: false
     });
   }
 
   setupBtn('singleThread');
-  if (await handlers.supportsThreads) {
+  if (await callInWorker(worker, 'supportsThreads')) {
     setupBtn('multiThread');
     threadInput.value = navigator.hardwareConcurrency;
     threadInput.disabled = false;
