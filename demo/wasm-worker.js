@@ -29,7 +29,9 @@ async function initHandlers() {
         './pkg-parallel/wasm_bindgen_rayon_demo.js'
       );
       await multiThread.default();
-      await multiThread.initThreadPool(navigator.hardwareConcurrency);
+      const nameData = new URLSearchParams(self.name);
+      const numThreads = Number(nameData.get('threads'));
+      await multiThread.initThreadPool(numThreads || navigator.hardwareConcurrency);
       return wrapExports(multiThread);
     })()
   ]);

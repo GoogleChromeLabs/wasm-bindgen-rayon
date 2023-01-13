@@ -19,6 +19,7 @@ const canvas = document.getElementById('canvas');
 const { width, height } = canvas;
 const ctx = canvas.getContext('2d');
 const timeOutput = document.getElementById('time');
+const threadInput = document.getElementById('thread-count');
 
 (async function init() {
   // Create a separate thread from wasm-worker.js and get a proxy to its handlers.
@@ -36,7 +37,22 @@ const timeOutput = document.getElementById('time');
     // Assign onclick handler + enable the button.
     Object.assign(document.getElementById(id), {
       async onclick() {
-        let { rawImageData, time } = await handler({
+        let thisHandler = handler;
+        let tmpWorker;
+
+        // Super hacky, but create a new worker for multi-threaded version
+        // so a particular number of threads can be initialized.
+        if (id === 'multiThread') {
+          tmpWorker = new Worker(new URL(`./wasm-worker.js`, import.meta.url), {
+            type: 'module',
+            // I'd rather pass this data in via the URL
+            // but Webpack is making assumptions about the source that prevent that.
+            name: `threads=${threadInput.value}`
+          });
+          thisHandler = (await Comlink.wrap(tmpWorker).handlers)[id];
+        }
+
+        let { rawImageData, time } = await thisHandler({
           width,
           height,
           maxIterations
@@ -44,6 +60,7 @@ const timeOutput = document.getElementById('time');
         timeOutput.value = `${time.toFixed(2)} ms`;
         const imgData = new ImageData(rawImageData, width, height);
         ctx.putImageData(imgData, 0, 0);
+        if (tmpWorker) tmpWorker.terminate();
       },
       disabled: false
     });
@@ -52,5 +69,7 @@ const timeOutput = document.getElementById('time');
   setupBtn('singleThread');
   if (await handlers.supportsThreads) {
     setupBtn('multiThread');
+    threadInput.value = navigator.hardwareConcurrency;
+    threadInput.disabled = false;
   }
 })();
