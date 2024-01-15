@@ -11,24 +11,17 @@
  * limitations under the License.
  */
 
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import init, { initThreadPool, sum } from './pkg/test.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+async function runTest() {
+  await init();
+  await initThreadPool(navigator.hardwareConcurrency);
+  // 1...10
+  let arr = Int32Array.from({ length: 10 }, (_, i) => i + 1);
+  if (sum(arr) !== 55) {
+    throw new Error('Wrong result.');
+  }
+  console.log('OK');
+}
 
-export default {
-  mode: 'production',
-  optimization: {
-    minimize: false
-  },
-  entry: {
-    index: './index.js'
-  },
-  output: {
-    path: __dirname + '/pkg/webpack/',
-  },
-  plugins: [new HtmlWebpackPlugin({
-    template: './index.html',
-  })]
-};
+runTest().then(postMessage);
