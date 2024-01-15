@@ -2,7 +2,7 @@
 	"private": true,
 	"dependencies": {
 		"@rollup/plugin-html": "^0.2.3",
-		"@surma/rollup-plugin-off-main-thread": "^2.1.0",
+		"@surma/rollup-plugin-off-main-thread": "^2.2.3",
 		"@web/rollup-plugin-import-meta-assets": "^1.0.4",
 		"get-port": "^5.1.1",
 		"html-webpack-plugin": "^5.2.0",
