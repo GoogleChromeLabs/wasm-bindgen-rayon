@@ -1,5 +1,5 @@
-/**
- * Copyright 2021 Google Inc. All Rights Reserved.
+/*
+ * Copyright 2022 Google Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,10 +11,11 @@
  * limitations under the License.
  */
 
-import nodeResolve from 'rollup-plugin-node-resolve';
+import nodeResolve from '@rollup/plugin-node-resolve';
 import offMainThread from '@surma/rollup-plugin-off-main-thread';
 import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
 import html from '@rollup/plugin-html';
+import { readFileSync } from 'fs';
 
 export default {
   input: './index.js',
@@ -24,5 +25,7 @@ export default {
     exports: 'named',
     name: 'rollupTest'
   },
-  plugins: [nodeResolve(), offMainThread(), importMetaAssets(), html({})]
+  plugins: [nodeResolve(), offMainThread(), importMetaAssets(), html({
+    template: () => readFileSync('./index.html', 'utf-8')
+  })]
 };
