@@ -11,7 +11,7 @@
 		"requirejs": "^2.3.6",
 		"rollup": "^2.38.4",
 		"rollup-plugin-node-resolve": "^5.2.0",
-		"serve-handler": "^6.1.3",
+		"serve-handler": "^6.1.5",
 		"wasm-pack": "^0.10.0",
 		"webpack": "^5.25.1",
 		"webpack-cli": "^4.5.0"
